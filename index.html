@@ -10,7 +10,7 @@
           width: 800px;
           height: 600px;
           background-color: #ccc;
-          position: absolute;
+          position: relative;
       }
   </style>
 </head>
@@ -31,7 +31,37 @@
           window.Randow = new Random();
       })(window);
 
-      console.log(Randow.getRandom(0, 50));
+      // 产生小方块(食物)对象
+      (function() {
+          // 获取地图元素
+          var map = document.querySelector(".map");
+          // 食物构造函数
+          function Food(width, height, color) {
+              // 食物的宽高, 与颜色
+              this.width = width || 20;
+              this.height = height || 20;
+              this.color = color || "green";
+              // 食物的位置
+              this.x = 0;
+              this.y = 0;
+              // 食物元素
+              this.element = document.createElement("div");
+          }
+          // 向Food原型对象中添加初始化方法
+          Food.prototype.init = function() {
+              // 设置食物样式
+              var div = this.element;
+              div.style.width = this.width + "px";
+              div.style.height = this.height  + "px";
+              div.style.backgroundColor = this.color;
+              div.style.position = "absolute";
+              // 将其添加到地图上
+              map.appendChild(div);
+          };
+
+          var fd = new Food();
+          fd.init();
+      })();
   </script>
 </body>
 </html>
