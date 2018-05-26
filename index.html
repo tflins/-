@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>贪吃蛇DEMO</title>
+  <style>
+      .map {
+          width: 800px;
+          height: 600px;
+          background-color: #ccc;
+          position: absolute;
+      }
+  </style>
+</head>
+<body>
+  <!--地图-->
+  <div class="map"></div>
+
+  <script>
+      // 产生随机数对象
+      (function(window) {
+          // 产生随机数对象构造函数
+          function Random() {}
+          // 往Random的原型中添加随机数方法
+          Random.prototype.getRandom = function(min, max) {
+              return Math.floor(Math.random() * (max - min) + min);
+          };
+          // 将随机数对象暴露给顶级作用域window
+          window.Randow = new Random();
+      })(window);
+
+      console.log(Randow.getRandom(0, 50));
+  </script>
+</body>
+</html>
