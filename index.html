@@ -28,7 +28,7 @@
               return Math.floor(Math.random() * (max - min) + min);
           };
           // 将随机数对象暴露给顶级作用域window
-          window.Randow = new Random();
+          window.Random = new Random();
       })(window);
 
       // 产生小方块(食物)对象
@@ -55,10 +55,21 @@
               div.style.height = this.height  + "px";
               div.style.backgroundColor = this.color;
               div.style.position = "absolute";
+              // 调用随机位置方法, 并传地图
+              this.render(map, div);
               // 将其添加到地图上
               map.appendChild(div);
           };
-
+          // 添加Food随机位置方法
+          Food.prototype.render = function(map, div) {
+              // 随机横纵坐标
+              var x = Random.getRandom(0, map.offsetWidth / this.width) * this.width;
+              var y = Random.getRandom(0, map.offsetHeight / this.height) * this.height;
+              this.x = x;
+              this.y = y;
+              div.style.left = this.x + "px";
+              div.style.top = this.y + "px";
+          }
           var fd = new Food();
           fd.init();
       })();
