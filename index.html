@@ -10,7 +10,7 @@
           width: 800px;
           height: 600px;
           margin: 0 auto;
-          background-color: #ccc;
+          background-color: #000;
           position: relative;
       }
   </style>
@@ -76,7 +76,7 @@
               this.width = width || 20;
               this.height = height || 20;
               // 小蛇的方向，开始默认向右
-              this.direction = direction || "bottom";
+              this.direction = direction || "right";
               // 小蛇的每一节身体
               this.body = [
                 {x : 3, y : 2, color : "red"}, // 头
@@ -134,7 +134,7 @@
                         break;
               }
           }
-          // 私有方法，用于删除小蛇
+          // 私有方法，用于删除旧小蛇
           function removeSnake() {
             var i = elements.length - 1;
             for (; i >= 0; i--) {
@@ -149,17 +149,82 @@
           window.Snake = Snake;
       }());
 
-      // 在进行优雅的外部测试
-      var fd = new Food();
-      fd.init(document.querySelector(".map"));
-      var sk = new Snake();
-      sk.init(document.querySelector(".map"));
+      // 自调用函数 --- 游戏对象
+      (function() {
+          var that = null;
+          // 游戏对象构造函数
+          function Game(map) {
+              this.food = new Food();
+              this.snake = new Snake();
+              this.map = map;
+              that = this;
+          }
+          // 初始化游戏
+          Game.prototype.init = function() {
+              this.food.init(this.map);
+              this.snake.init(this.map);
+              this.runSnake();
+              this.bindKey();
+          };
+          // 移动小蛇
+          Game.prototype.runSnake = function() {
+              var setTime = setInterval(function() {
+                  this.snake.move(this.food, this.map);
+                  this.snake.init(this.map);
+                  // 获取地图的最大横纵坐标
+                  var maxX = this.map.offsetWidth / this.snake.width;
+                  var maxY = this.map.offsetHeight / this.snake.height;
+                  // 判断小蛇是否撞墙
+                  if (this.snake.body[0].x >= maxX || this.snake.body[0].x < 0) {
+                      alert("撞墙咯！");
+                      clearInterval(setTime);
+                  }
+                  if (this.snake.body[0].y >= maxY || this.snake.body[0].y < 0) {
+                      alert("撞墙咯！");
+                      clearInterval(setTime);
+                  }
+                  // 用于测试console.log(this.snake.body[0].x + "====" + this.food.x);
+                  // 判断是否吃到食物
+                  if (this.snake.body[0].x === (this.food.x / this.food.width) && this.snake.body[0].y === (this.food.y  / this.food.height)) {
+                      // 复制蛇的最后一节身体
+                      this.snake.body.push({
+                          x : this.snake.body[this.snake.body.length - 1].x,
+                          y : this.snake.body[this.snake.body.length - 1].y,
+                          color : "green"
+                        });
+                      // 初始化食物
+                      this.food.init(this.map);
+                  }
+              }.bind(that) ,150);
+          };
+          // 控制小蛇方向
+          Game.prototype.bindKey = function() {
+              // 给文档注册键盘事件
+              document.onkeydown = function(event) {
+                  switch (event.keyCode) {
+                    case 37:
+                      this.snake.direction = "left";
+                      break;
+                      case 38:
+                        this.snake.direction = "top";
+                        break;
+                        case 39:
+                          this.snake.direction = "right";
+                          break;
+                          case 40:
+                            this.snake.direction = "bottom";
+                            break;
+                  }
+              }.bind(that);
+          };
+          // 将其暴露给window
+          window.Game = Game;
+      }());
 
-      setInterval(function() {
-        sk.move(fd, document.querySelector(".map"));
-        sk.init(document.querySelector(".map"));
-      },150);
-      console.log(fd.x + "====" + fd.y);
+    // 优雅外部测试
+    // 初始化游戏
+    var game = new Game(document.querySelector(".map"));
+    game.init();
   </script>
 </body>
 </html>
