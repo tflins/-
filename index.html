@@ -9,6 +9,7 @@
       .map {
           width: 800px;
           height: 600px;
+          margin: 0 auto;
           background-color: #ccc;
           position: relative;
       }
@@ -19,15 +20,15 @@
   <div class="map"></div>
 
   <script>
-      // 产生小方块(食物)对象
+      // 自调用函数，产生小方块(食物)对象
       (function() {
           // 存放食物元素数组
-          var element = [];
+          var elements = [];
           // 食物构造函数
-          function Food(x, y, width, height, color) {
+          function Food(width, height, color) {
               // 食物的x,y坐标和宽高, 颜色
-              this.x = x || 0;
-              this.y = y || 0;
+              this.x = 0;
+              this.y = 0;
               this.width = width || 20;
               this.height = height || 20;
               this.color = color || "green";
@@ -51,25 +52,113 @@
               // 将其添加到地图上
               map.appendChild(div);
               // 推入食物数组，方便查找
-              element.push(div);
+              elements.push(div);
           };
           // 私有方法，用于删除食物
           function removeFood() {
-              var i = 0, len =  element.length;
+              var i = 0, len =  elements.length;
               for (; i < len; i++) {
-                  var div = element[i];
+                  var div = elements[i];
                   div.remove();
-                  element.splice(i, 1);
+                  elements.splice(i, 1);
               }
           }
           window.Food = Food;
       }());
 
-      // 外部测试姐姐
+      // 自调用函数，产生小蛇对象
+      (function() {
+          // 存放每个小蛇数组
+          var elements = [];
+          // 小蛇的构造函数
+          function Snake(width, height, direction) {
+              // 小蛇的宽高
+              this.width = width || 20;
+              this.height = height || 20;
+              // 小蛇的方向，开始默认向右
+              this.direction = direction || "bottom";
+              // 小蛇的每一节身体
+              this.body = [
+                {x : 3, y : 2, color : "red"}, // 头
+                {x : 2, y : 2, color : "green"},
+                {x : 1, y : 2, color : "green"}
+              ];
+          }
+          // 往Snake原型对象中添加初始化方法
+          Snake.prototype.init = function(map) {
+              // 调用删除旧蛇函数，避免出现自增长蛇
+              removeSnake();
+              // 创建小蛇每一个身体
+              var i = 0, len = this.body.length;
+              for (; i < len; i++) {
+                  // 本节身体
+                  var body = this.body[i];
+                  // 创建元素
+                  var obj = document.createElement("div");
+                  // 设置样式
+                  obj.style.width = this.width + "px";
+                  obj.style.height = this.height + "px";
+                  obj.style.backgroundColor = body.color;
+                  // 脱离文档流
+                  obj.style.position = "absolute";
+                  // 设置坐标
+                  obj.style.left = body.x * this.width + "px";
+                  obj.style.top = body.y * this.height + "px";
+                  // 添加到地图上
+                  map.appendChild(obj);
+                  // 推入小蛇数组中
+                  elements.push(obj);
+              }
+          };
+          // 小蛇移动方法
+          Snake.prototype.move = function(food, map) {
+              // 每节身体的坐标变为上一节身体的坐标
+              var i = this.body.length - 1;
+              for (; i > 0; i--) {
+                  this.body[i].x = this.body[i - 1].x;
+                  this.body[i].y = this.body[i - 1].y;
+              }
+              // 判断小蛇方向，舌头单独移动
+              switch (this.direction) {
+                case "right":
+                  this.body[0].x += 1;
+                  break;
+                  case "left":
+                    this.body[0].x -= 1;
+                    break;
+                    case "top":
+                      this.body[0].y -= 1;
+                      break;
+                      case "bottom":
+                        this.body[0].y += 1;
+                        break;
+              }
+          }
+          // 私有方法，用于删除小蛇
+          function removeSnake() {
+            var i = elements.length - 1;
+            for (; i >= 0; i--) {
+                var div = elements[i];
+                // 从地图中删除div
+                div.remove();
+                // 从数组中移除
+                elements.splice(i, 1);
+            }
+          }
+          // 将Snake暴露给window
+          window.Snake = Snake;
+      }());
+
+      // 在进行优雅的外部测试
       var fd = new Food();
-      for (var i = 0; i < 500; i++) {
-        fd.init(document.querySelector(".map"));
-      }
+      fd.init(document.querySelector(".map"));
+      var sk = new Snake();
+      sk.init(document.querySelector(".map"));
+
+      setInterval(function() {
+        sk.move(fd, document.querySelector(".map"));
+        sk.init(document.querySelector(".map"));
+      },150);
       console.log(fd.x + "====" + fd.y);
   </script>
 </body>
