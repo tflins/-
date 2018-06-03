@@ -121,17 +121,17 @@
               // 判断小蛇方向，舌头单独移动
               switch (this.direction) {
                 case "right":
-                  this.body[0].x += 1;
-                  break;
-                  case "left":
+                    this.body[0].x += 1;
+                    break;
+                case "left":
                     this.body[0].x -= 1;
                     break;
-                    case "top":
-                      this.body[0].y -= 1;
+                case "top":
+                    this.body[0].y -= 1;
+                    break;
+                case "bottom":
+                      this.body[0].y += 1;
                       break;
-                      case "bottom":
-                        this.body[0].y += 1;
-                        break;
               }
           }
           // 私有方法，用于删除旧小蛇
@@ -202,18 +202,32 @@
               // 给文档注册键盘事件
               document.onkeydown = function(event) {
                   switch (event.keyCode) {
-                    case 37:
-                      this.snake.direction = "left";
-                      break;
+                      case 37:
+                          // 排除反方向，避免蛇可以180度转向
+                          if (this.snake.direction === "right") {
+                              return false;
+                          }
+                          // 改变蛇的方向
+                          this.snake.direction = "left";
+                          break;
                       case 38:
+                        if (this.snake.direction === "bottom") {
+                            return false;
+                        }
                         this.snake.direction = "top";
                         break;
-                        case 39:
+                      case 39:
+                          if (this.snake.direction === "left") {
+                              return false;
+                          }
                           this.snake.direction = "right";
                           break;
-                          case 40:
-                            this.snake.direction = "bottom";
-                            break;
+                      case 40:
+                          if (this.snake.direction === "top") {
+                              return false;
+                          }
+                          this.snake.direction = "bottom";
+                          break;
                   }
               }.bind(that);
           };
