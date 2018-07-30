@@ -6,7 +6,7 @@
 
 使用原生JS实现的一个简单贪吃蛇
 
-可以狠狠的点这里[贪吃蛇](https://tflins.github.io/snake.html)进行玩耍
+可以狠狠的点这里[贪吃蛇](http://tflin.com/demo/snake/)进行玩耍
 
 ---
 
